@@ -33,6 +33,7 @@ services:
       dockerfile: Dockerfile
     container_name: restocost-backend
     restart: unless-stopped
+    user: root  # Use root for development to avoid permission issues
     environment:
       # Database
       DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-restocost}:${POSTGRES_PASSWORD:-restocost}@postgres:5432/${POSTGRES_DB:-restocost}

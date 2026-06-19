@@ -21,8 +21,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # Set working directory
 WORKDIR /app
 
-# Copy dependency files
+# Copy dependency files and code
 COPY pyproject.toml ./
+COPY app ./app
 
 # Install Python dependencies
 RUN pip install --upgrade pip setuptools wheel && \
