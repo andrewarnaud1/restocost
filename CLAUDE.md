@@ -21,21 +21,21 @@ This file guides Claude Code on how to develop features in RestoCost. Claude wil
 ```
 backend/app/
 ├── main.py              # FastAPI app initialization
-├── config.py            # Pydantic Settings
-├── api/
-│   └── endpoints/       # Route handlers (organized by feature)
-│       ├── auth.py      # Authentication routes
-│       ├── ingredients.py
-│       ├── suppliers.py
-│       ├── recipes.py
-│       └── quotes.py
+├── dependencies.py      # Centralized dependency injection (get_db, etc.)
 ├── core/
+│   ├── config.py        # Pydantic Settings
 │   ├── security.py      # JWT, bcrypt, password hashing
 │   ├── exceptions.py    # Custom exceptions
 │   └── logger.py        # Logging setup
 ├── db/
-│   ├── base.py          # SQLAlchemy Base
-│   └── session.py       # Database session management
+│   └── database.py      # SQLAlchemy Base + session + connection check
+├── routers/             # Route handlers (organized by feature)
+│   ├── health.py        # Health check endpoints
+│   ├── auth.py          # Authentication routes
+│   ├── ingredients.py
+│   ├── suppliers.py
+│   ├── recipes.py
+│   └── quotes.py
 ├── models/              # SQLAlchemy ORM models
 │   ├── base.py
 │   ├── user.py
@@ -191,8 +191,9 @@ from fastapi import FastAPI, Depends
 from sqlalchemy import Column, String
 
 # 3. Local
-from app.config import Settings
+from app.core.config import Settings
 from app.models.user import User
+from app.dependencies import get_db
 ```
 
 #### Docstring Format (Google Style)
