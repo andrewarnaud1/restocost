@@ -53,28 +53,39 @@ The **first step** when setting up RestoCost is to create a super administrator.
 ### Method 1: Interactive (Recommended)
 
 ```bash
+# If installed globally
+restocost create-admin
+
+# Or from backend directory
 cd backend
-python create_admin.py
+../.venv/bin/restocost create-admin
 ```
 
 You will be prompted:
 
 ```
-Admin email: admin@restocost.com
-Admin password: ********
-Confirm password: ********
+📧 Admin email: admin@restocost.com
+🔑 Admin password: ********
+🔑 Confirm password: ********
 
 Creating super admin user...
-✅ Super admin user created successfully!
-   Email: admin@restocost.com
-   Role: admin
-   ID: 1
+
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃           Success            ┃
+┠──────────────────────────────┨
+┃ ✅ Super admin user created  ┃
+┃    successfully!             ┃
+┃                              ┃
+┃ Email: admin@restocost.com   ┃
+┃ Role: admin                  ┃
+┃ ID: 1                        ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 ```
 
 ### Method 2: Command Line Arguments
 
 ```bash
-python create_admin.py --email admin@restocost.com --password YourSecurePassword123
+restocost create-admin --email admin@restocost.com --password YourSecurePassword123
 ```
 
 ⚠️ **Warning:** This method shows the password in shell history. Only use in secure environments.
@@ -84,7 +95,7 @@ python create_admin.py --email admin@restocost.com --password YourSecurePassword
 If running in Docker:
 
 ```bash
-docker exec -it restocost-backend python create_admin.py
+docker-compose exec backend restocost create-admin
 ```
 
 ---
@@ -391,7 +402,11 @@ class UserCreate(UserBase):
 
 ### Create Super Admin
 ```bash
-python create_admin.py
+# Local development
+restocost create-admin
+
+# With Docker
+docker-compose exec backend restocost create-admin
 ```
 
 ### Create Owner (as Admin)
