@@ -3,6 +3,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.config import get_settings
 from app.dependencies import get_current_user, get_db
 from app.models.user import User
 from app.schemas.user import TokenResponse, UserCreate, UserLogin, UserResponse
@@ -12,6 +13,8 @@ from app.services.auth_service import (
     create_user_tokens,
     get_user_by_email,
 )
+
+settings = get_settings()
 
 router = APIRouter(prefix="/auth", tags=["authentication"])
 
@@ -42,6 +45,16 @@ async def register(
           -d '{"email": "user@example.com", "password": "securepass123"}'
         ```
     """
+    # Check if registration is allowed
+    if not settings.ALLOW_REGISTRATION:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail=(
+                "Registration is currently disabled. "
+                "Please contact an administrator."
+            ),
+        )
+
     # Check if user already exists
     existing_user = await get_user_by_email(db, user_data.email)
     if existing_user:

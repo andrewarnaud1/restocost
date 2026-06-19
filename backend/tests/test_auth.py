@@ -5,7 +5,29 @@ from unittest.mock import AsyncMock, patch
 from fastapi import status
 from fastapi.testclient import TestClient
 
+from app.core.config import Settings
 from app.models.user import User
+
+
+def test_register_disabled_by_default(client: TestClient) -> None:
+    """Test that registration is disabled by default.
+
+    Args:
+        client: FastAPI test client.
+    """
+    # Arrange - Use default settings where ALLOW_REGISTRATION=False
+    with patch("app.routers.auth.settings", Settings(ALLOW_REGISTRATION=False)):
+        # Act
+        response = client.post(
+            "/api/auth/register",
+            json={"email": "test@example.com", "password": "securepass123"},
+        )
+
+        # Assert
+        assert response.status_code == status.HTTP_403_FORBIDDEN
+        assert (
+            "Registration is currently disabled" in response.json()["detail"]
+        )
 
 
 def test_register_success(client: TestClient) -> None:
@@ -14,10 +36,14 @@ def test_register_success(client: TestClient) -> None:
     Args:
         client: FastAPI test client.
     """
-    # Arrange
-    with patch("app.routers.auth.get_user_by_email", return_value=None), patch(
+    # Arrange - Enable registration for this test
+    with patch(
+        "app.routers.auth.settings", Settings(ALLOW_REGISTRATION=True)
+    ), patch("app.routers.auth.get_user_by_email", return_value=None), patch(
         "app.routers.auth.create_user"
-    ) as mock_create, patch("app.routers.auth.create_user_tokens") as mock_tokens:
+    ) as mock_create, patch(
+        "app.routers.auth.create_user_tokens"
+    ) as mock_tokens:
         # Setup mocks
         mock_user = AsyncMock(spec=User)
         mock_user.id = 1
@@ -50,8 +76,10 @@ def test_register_email_already_exists(client: TestClient) -> None:
     Args:
         client: FastAPI test client.
     """
-    # Arrange
-    with patch("app.routers.auth.get_user_by_email") as mock_get_user:
+    # Arrange - Enable registration for this test
+    with patch(
+        "app.routers.auth.settings", Settings(ALLOW_REGISTRATION=True)
+    ), patch("app.routers.auth.get_user_by_email") as mock_get_user:
         mock_user = AsyncMock(spec=User)
         mock_user.email = "existing@example.com"
         mock_get_user.return_value = mock_user
@@ -162,7 +190,12 @@ def test_get_current_user_invalid_token(client: TestClient) -> None:
         client: FastAPI test client.
     """
     # Arrange
-    with patch("app.dependencies.decode_token", side_effect=Exception("Invalid token")):
+    import jwt
+
+    with patch(
+        "app.dependencies.decode_token",
+        side_effect=jwt.InvalidTokenError("Invalid token"),
+    ):
         # Act
         response = client.get(
             "/api/auth/me",
@@ -182,8 +215,8 @@ def test_get_current_user_no_token(client: TestClient) -> None:
     # Act
     response = client.get("/api/auth/me")
 
-    # Assert
-    assert response.status_code == status.HTTP_403_FORBIDDEN
+    # Assert - HTTPBearer returns 401 when no credentials provided
+    assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
 
 def test_register_invalid_email(client: TestClient) -> None:
@@ -192,14 +225,16 @@ def test_register_invalid_email(client: TestClient) -> None:
     Args:
         client: FastAPI test client.
     """
-    # Act
-    response = client.post(
-        "/api/auth/register",
-        json={"email": "invalid-email", "password": "securepass123"},
-    )
+    # Arrange - Enable registration for this test
+    with patch("app.routers.auth.settings", Settings(ALLOW_REGISTRATION=True)):
+        # Act
+        response = client.post(
+            "/api/auth/register",
+            json={"email": "invalid-email", "password": "securepass123"},
+        )
 
-    # Assert
-    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+        # Assert
+        assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
 
 
 def test_login_missing_fields(client: TestClient) -> None:
