@@ -87,14 +87,18 @@ docker-compose up -d postgres
 # Run migrations
 cd backend
 alembic upgrade head
-cd ..
 
-# Start backend (from project root)
-cd backend
+# Create super admin (FIRST TIME ONLY)
+python create_admin.py
+# Follow prompts to create admin account
+
+# Start backend
 uvicorn app.main:app --reload
 # API available at: http://localhost:8000
 # Docs at: http://localhost:8000/docs
 ```
+
+> 📖 **See [User Management Guide](./backend/docs/USER_MANAGEMENT.md) for complete user creation documentation**
 
 ### Frontend Setup
 
@@ -182,6 +186,7 @@ restocost/
 
 ## 📚 Documentation
 
+- **[User Management Guide](./backend/docs/USER_MANAGEMENT.md)** - Complete guide for creating and managing users
 - **[Architecture](./docs/ARCHITECTURE.md)** - System design & component overview
 - **[Setup Guide](./docs/SETUP.md)** - Detailed local development setup
 - **[API Reference](./docs/API.md)** - FastAPI endpoints documentation

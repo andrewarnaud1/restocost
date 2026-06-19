@@ -1,5 +1,7 @@
 """Security utilities for JWT and password hashing."""
 
+import secrets
+import string
 from datetime import UTC, datetime, timedelta
 from typing import Any
 
@@ -101,3 +103,34 @@ def decode_token(token: str) -> dict[str, Any]:
         token, settings.SECRET_KEY, algorithms=[ALGORITHM]
     )
     return payload
+
+
+def generate_temporary_password(length: int = 12) -> str:
+    """Generate a secure temporary password.
+
+    Args:
+        length: Length of the password (default: 12).
+
+    Returns:
+        Randomly generated password string.
+
+    Example:
+        >>> pwd = generate_temporary_password()
+        >>> len(pwd)
+        12
+        >>> pwd = generate_temporary_password(16)
+        >>> len(pwd)
+        16
+    """
+    alphabet = string.ascii_letters + string.digits
+    # Ensure at least one uppercase, one lowercase, and one digit
+    password = [
+        secrets.choice(string.ascii_uppercase),
+        secrets.choice(string.ascii_lowercase),
+        secrets.choice(string.digits),
+    ]
+    # Fill the rest randomly
+    password += [secrets.choice(alphabet) for _ in range(length - 3)]
+    # Shuffle to avoid predictable pattern
+    secrets.SystemRandom().shuffle(password)
+    return "".join(password)

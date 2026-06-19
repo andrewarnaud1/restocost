@@ -4,14 +4,20 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.config import get_settings
+from app.core.security import verify_password
 from app.dependencies import get_current_user, get_db
 from app.models.user import User
-from app.schemas.user import TokenResponse, UserCreate, UserLogin, UserResponse
+from app.schemas.user import (
+    ChangePasswordRequest,
+    TokenResponse,
+    UserCreate,
+    UserLogin,
+    UserResponse,
+)
 from app.services.auth_service import (
     authenticate_user,
-    create_user,
+    change_password,
     create_user_tokens,
-    get_user_by_email,
 )
 
 settings = get_settings()
@@ -28,6 +34,8 @@ async def register(
 ) -> TokenResponse:
     """Register a new user.
 
+    Public registration is disabled. All users must be created by an administrator.
+
     Args:
         user_data: User registration data with email and password.
         db: Database session.
@@ -36,39 +44,19 @@ async def register(
         TokenResponse with access and refresh tokens.
 
     Raises:
-        HTTPException: 400 if email already registered.
+        HTTPException: 403 - Registration is always disabled.
 
-    Example:
-        ```bash
-        curl -X POST http://localhost:8000/api/auth/register \\
-          -H "Content-Type: application/json" \\
-          -d '{"email": "user@example.com", "password": "securepass123"}'
-        ```
+    Note:
+        This endpoint is kept for API compatibility but always returns 403.
+        Users must be created via /api/admin/users by an administrator.
     """
-    # Check if registration is allowed
-    if not settings.ALLOW_REGISTRATION:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail=(
-                "Registration is currently disabled. "
-                "Please contact an administrator."
-            ),
-        )
-
-    # Check if user already exists
-    existing_user = await get_user_by_email(db, user_data.email)
-    if existing_user:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Email already registered",
-        )
-
-    # Create new user
-    user = await create_user(db, user_data)
-
-    # Generate tokens
-    tokens = create_user_tokens(user.id)
-    return tokens
+    raise HTTPException(
+        status_code=status.HTTP_403_FORBIDDEN,
+        detail=(
+            "Public registration is disabled. "
+            "Please contact an administrator to create an account for you."
+        ),
+    )
 
 
 @router.post("/login", response_model=TokenResponse)
@@ -130,3 +118,51 @@ async def get_current_user_info(
         ```
     """
     return UserResponse.model_validate(current_user)
+
+
+@router.post("/change-password", response_model=UserResponse)
+async def change_user_password(
+    password_data: ChangePasswordRequest,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+) -> UserResponse:
+    """Change current user's password.
+
+    Users with must_change_password=True must use this endpoint before
+    accessing other protected resources.
+
+    Args:
+        password_data: Current and new password.
+        current_user: Current authenticated user from JWT token.
+        db: Database session.
+
+    Returns:
+        UserResponse with updated user information.
+
+    Raises:
+        HTTPException: 400 if current password is incorrect.
+
+    Example:
+        ```bash
+        curl -X POST http://localhost:8000/api/auth/change-password \\
+          -H "Authorization: Bearer <your_access_token>" \\
+          -H "Content-Type: application/json" \\
+          -d '{
+            "current_password": "TempPass123",
+            "new_password": "MyNewSecurePass456"
+          }'
+        ```
+    """
+    # Verify current password
+    if not verify_password(
+        password_data.current_password, current_user.hashed_password
+    ):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Current password is incorrect",
+        )
+
+    # Change password
+    updated_user = await change_password(db, current_user, password_data.new_password)
+
+    return UserResponse.model_validate(updated_user)

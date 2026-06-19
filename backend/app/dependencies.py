@@ -96,3 +96,40 @@ async def get_current_user(
         raise credentials_exception
 
     return user
+
+
+async def get_current_admin(
+    current_user: User = Depends(get_current_user),
+) -> User:
+    """Get current authenticated user and verify they are an admin or owner.
+
+    Admins and owners can create users and manage the system.
+
+    Args:
+        current_user: Current authenticated user.
+
+    Returns:
+        Current authenticated User object with admin or owner role.
+
+    Raises:
+        HTTPException: If user is not an admin or owner.
+
+    Example:
+        ```python
+        from fastapi import Depends
+        from app.dependencies import get_current_admin
+        from app.models.user import User
+
+        @router.post("/admin/users")
+        async def create_user(admin: User = Depends(get_current_admin)):
+            # Only admins/owners can access this endpoint
+            return {"message": "Admin access granted"}
+        ```
+    """
+    if current_user.role not in ("admin", "owner"):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Only administrators can perform this action",
+        )
+
+    return current_user
