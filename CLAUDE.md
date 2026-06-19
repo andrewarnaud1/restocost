@@ -8,7 +8,7 @@ This file guides Claude Code on how to develop features in RestoCost. Claude wil
 
 **RestoCost** is a production-ready restaurant cost management system.
 
-- **Backend**: FastAPI (Python 3.14+) with async/await
+- **Backend**: FastAPI (Python 3.13+) with async/await
 - **Frontend**: React 19 with TypeScript strict mode
 - **Database**: PostgreSQL 16 with async SQLAlchemy 2.0
 - **Quality**: 100% type-safe, 80%+ test coverage enforced

@@ -40,7 +40,7 @@ dev = [
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 asyncio_mode = "auto"
-addopts = "-v --cov=app --cov-report=term-missing -p pytest_python314_patch"
+addopts = "-v --cov=app --cov-report=term-missing"
 
 [tool.coverage.run]
 source = ["app"]

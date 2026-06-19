@@ -2,7 +2,7 @@
 
 [![CI/CD Status](https://github.com/andrewarnaud1/restocost/actions/workflows/ci.yml/badge.svg)](https://github.com/andrewarnaud1/restocost/actions)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Python 3.14+](https://img.shields.io/badge/Python-3.14+-blue.svg)](https://www.python.org/downloads/)
+[![Python 3.13+](https://img.shields.io/badge/Python-3.13+-blue.svg)](https://www.python.org/downloads/)
 [![React 19](https://img.shields.io/badge/React-19-61dafb.svg)](https://react.dev/)
 
 **Production-ready restaurant cost management system** - Calculate recipe costs, manage suppliers, and optimize menu pricing.
@@ -31,7 +31,7 @@
 ### Backend
 | Component | Version | Purpose |
 |-----------|---------|---------|
-| **FastAPI** | 0.136.1 | Web framework (Python 3.14+) |
+| **FastAPI** | 0.136.1 | Web framework (Python 3.13+) |
 | **SQLAlchemy** | 2.0.30+ | ORM & database abstraction |
 | **Pydantic** | 2.13.3+ | Data validation & serialization |
 | **PostgreSQL** | 16 | Production database |
@@ -62,7 +62,7 @@
 ## 🚀 Quick Start
 
 ### Prerequisites
-- **Python 3.14+** ([Download](https://www.python.org/downloads/))
+- **Python 3.13+** ([Download](https://www.python.org/downloads/))
 - **Node.js 20+ LTS** ([Download](https://nodejs.org/))
 - **PostgreSQL 16** ([Download](https://www.postgresql.org/download/) or use Docker)
 - **Git** ([Download](https://git-scm.com/))
@@ -75,7 +75,7 @@ git clone https://github.com/andrewarnaud1/restocost.git
 cd restocost
 
 # Create Python virtual environment
-python3.14 -m venv venv
+python3.13 -m venv venv
 source venv/bin/activate  # On Windows: venv\Scripts\activate
 
 # Install dependencies
@@ -461,8 +461,8 @@ Deployment is planned for **Sprint 4**. Supported platforms:
 
 ## 💬 FAQ
 
-**Q: Why Python 3.14?**  
-A: Latest stable version (Oct 2025) with 5 years of support. Better performance & security patches.
+**Q: Why Python 3.13?**
+A: Latest stable version (Oct 2024) with 5 years of support. Better performance & security patches.
 
 **Q: Why React 19 RC?**  
 A: Stable release candidate with new hooks and better performance. Easy to upgrade when stable.
