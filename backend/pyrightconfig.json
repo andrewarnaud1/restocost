@@ -1,0 +1,10 @@
+{
+  "include": ["app"],
+  "exclude": ["**/__pycache__", "**/node_modules", ".venv"],
+  "typeCheckingMode": "strict",
+  "pythonVersion": "3.14",
+  "reportMissingImports": true,
+  "reportMissingTypeStubs": false,
+  "venvPath": "..",
+  "venv": ".venv"
+}
