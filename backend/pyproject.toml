@@ -24,6 +24,8 @@ dependencies = [
     "alembic>=1.14.0",
     "uvicorn[standard]>=0.30.0",
     "typer>=0.15.0",
+    "sqladmin>=0.19.0",
+    "itsdangerous>=2.0.0",
 ]
 
 [project.optional-dependencies]
