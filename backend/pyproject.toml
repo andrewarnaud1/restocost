@@ -2,21 +2,30 @@
 requires = ["setuptools>=68.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
+[tool.setuptools]
+packages = ["app"]
+
 [project]
 name = "restocost"
 version = "0.1.0"
 description = "Restaurant cost management system"
-requires-python = ">=3.14"
+requires-python = ">=3.13"
 dependencies = [
     "fastapi==0.136.1",
     "sqlalchemy>=2.0.30",
     "pydantic>=2.13.3",
     "pydantic-settings>=2.0.0",
+    "pydantic[email]>=2.13.3",
     "asyncpg>=0.30.0",
+    "aiosqlite>=0.20.0",
     "PyJWT>=2.10.0",
-    "bcrypt>=4.2.0",
+    "passlib[bcrypt]>=1.7.4",
+    "python-multipart>=0.0.12",
     "alembic>=1.14.0",
     "uvicorn[standard]>=0.30.0",
+    "typer>=0.15.0",
+    "sqladmin>=0.19.0",
+    "itsdangerous>=2.0.0",
 ]
 
 [project.optional-dependencies]
@@ -31,10 +40,13 @@ dev = [
     "httpx>=0.27.0",
 ]
 
+[project.scripts]
+restocost = "app.cli:app"
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 asyncio_mode = "auto"
-addopts = "-v --cov=app --cov-report=term-missing -p pytest_python314_patch"
+addopts = "-v --cov=app --cov-report=term-missing"
 
 [tool.coverage.run]
 source = ["app"]
@@ -48,13 +60,13 @@ precision = 2
 include = ["app"]
 exclude = ["**/__pycache__", "**/node_modules", ".venv"]
 typeCheckingMode = "strict"
-pythonVersion = "3.14"
+pythonVersion = "3.13"
 reportMissingImports = true
 reportMissingTypeStubs = false
 
 [tool.ruff]
 line-length = 88
-target-version = "py314"
+target-version = "py313"
 
 [tool.ruff.lint]
 select = [
@@ -70,10 +82,12 @@ ignore = []
 
 [tool.ruff.lint.per-file-ignores]
 "__init__.py" = ["F401"]
+"app/routers/*.py" = ["B008"]  # FastAPI Depends is OK in defaults
+"app/dependencies.py" = ["B008"]  # FastAPI Depends is OK in defaults
 
 [tool.black]
 line-length = 88
-target-version = ["py314"]
+target-version = ["py313"]
 include = '\.pyi?$'
 
 [tool.isort]

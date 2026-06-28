@@ -31,6 +31,7 @@ class Settings(BaseSettings):
     SECRET_KEY: str = "your-secret-key-here-change-in-production"
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
+    ALLOW_REGISTRATION: bool = False  # Set to True to enable public registration
 
     model_config = SettingsConfigDict(
         env_file=".env",
